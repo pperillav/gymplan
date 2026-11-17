@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>GymPlan</title>
+<meta name="description" content="Plan de entrenamiento en máquinas de gimnasio para perder grasa conservando músculo.">
+<meta name="theme-color" content="#0C0C0F">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="GymPlan">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..125,400..900&family=Archivo+Black&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="top">
+  <div><div class="kicker">Tu plan de gimnasio</div><div class="marca">GymPlan</div></div>
+  <button class="icon-btn" id="btnAjustes" aria-label="Ajustes">⚙</button>
+</header>
+<div class="banner hidden" id="banner"><span>Hay una versión nueva de la app</span><button id="btnActualizar">Actualizar</button></div>
+
+<!-- ======================= HOY ======================= -->
+<section class="view activo" id="v-hoy">
+  <div class="stats">
+    <div class="stat racha"><div class="v" id="stRacha">0</div><div class="l">🔥 Racha (días)</div></div>
+    <div class="stat"><div class="v" id="stSemana">0/6</div><div class="l">Esta semana</div></div>
+    <div class="stat"><div class="v" id="stTotal">0</div><div class="l">Sesiones</div></div>
+  </div>
+  <div class="semana-nav">
+    <button id="semPrev" aria-label="Semana anterior">‹</button>
+    <span class="txt" id="semanaTxt"></span>
+    <span><button id="btnHoy" class="hoy-btn hidden">Hoy</button> <button id="semNext" aria-label="Semana siguiente">›</button></span>
+  </div>
+  <div class="diasbar" id="diasbar"></div>
+  <div id="avisos"></div>
+
+  <div class="dia-head">
+    <div><h2 id="diaTitulo"></h2><div class="dia-meta" id="diaMeta"></div></div>
+    <select id="selRutina" class="sel-rutina" aria-label="Rutina de este día"></select>
+  </div>
+  <div class="card resumen">
+    <div class="anillo">
+      <svg width="78" height="78" viewBox="0 0 80 80">
+        <circle cx="40" cy="40" r="34" fill="none" stroke="#1F1F26" stroke-width="7"/>
+        <circle id="arco" cx="40" cy="40" r="34" fill="none" stroke="var(--tema)" stroke-width="7" stroke-linecap="round" stroke-dasharray="213.6" stroke-dashoffset="213.6" style="transition:stroke-dashoffset .5s"/>
+      </svg>
+      <div class="c"><div class="p" id="pct">0%</div><div class="m" id="series">0/0</div></div>
+    </div>
+    <div><div class="frase" id="frase"></div><div class="autor" id="autor"></div><span class="reloj hidden" id="reloj"></span></div>
+  </div>
+  <div class="foco" id="foco"></div>
+  <div id="lista"></div>
+
+  <div class="sec-t">Hábitos de hoy</div>
+  <div class="habitos" id="habitos"></div>
+  <div class="sec-t">Nota de la sesión</div>
+  <textarea id="notaSesion" maxlength="400" placeholder="Ej.: dormí mal · el hombro molestó en el chest press · la 22 estaba ocupada"></textarea>
+  <div class="acciones">
+    <button class="btn" id="btnReiniciar">Reiniciar día</button>
+    <button class="btn pri" id="btnFin">Terminar sesión</button>
+  </div>
+</section>
+
+<!-- ======================= PLAN ======================= -->
+<section class="view" id="v-plan">
+  <div class="sec-t">Volumen semanal por músculo</div>
+  <div class="card" id="volumen"></div>
+  <div class="sec-t">Tu semana · colores de zona del gimnasio</div>
+  <div class="card">
+    <div class="row"><span><span class="zona-dot" style="display:inline-block;background:#3D8BFD;margin-right:6px"></span>Piernas (01–10)</span><span><span class="zona-dot" style="display:inline-block;background:#FF8A3D;margin-right:6px"></span>Tronco (20–24)</span></div>
+    <div class="row"><span><span class="zona-dot" style="display:inline-block;background:#3ECF6E;margin-right:6px"></span>Brazos (50–51)</span><span><span class="zona-dot" style="display:inline-block;background:#FF5A4E;margin-right:6px"></span>Abdomen y lumbar (40–42)</span></div>
+  </div>
+  <div id="planLista"></div>
+</section>
+
+<!-- ======================= PROGRESO ======================= -->
+<section class="view" id="v-progreso">
+  <div class="sec-t">¿Pierdes grasa sin perder músculo?</div>
+  <div class="card semaforo" id="semaforo"></div>
+  <div class="sec-t">Esta semana</div>
+  <div id="revision"></div>
+
+  <div class="sec-t">Medidas corporales</div>
+  <div class="card">
+    <div class="form-grid">
+      <label>Fecha<input type="date" id="mFecha"></label>
+      <label>Peso (kg)<input type="number" inputmode="decimal" step="0.1" id="mPeso"></label>
+      <label>Cintura (cm)<input type="number" inputmode="decimal" step="0.5" id="mCintura"></label>
+      <label>Cuello (cm)<input type="number" inputmode="decimal" step="0.5" id="mCuello"></label>
+      <label>Cadera (cm)<input type="number" inputmode="decimal" step="0.5" id="mCadera"></label>
+      <label>Pecho (cm)<input type="number" inputmode="decimal" step="0.5" id="mPecho"></label>
+      <label>% grasa (opcional)<input type="number" inputmode="decimal" step="0.1" id="mGrasa"></label>
+    </div>
+    <div class="acciones"><button class="btn pri" id="mGuardar">Guardar medidas</button></div>
+    <p class="muted" style="font-size:11.5px">Cómo medir: cintura a la altura del ombligo, relajado y al final de una exhalación; cuello justo debajo de la nuez; cadera en la parte más ancha. Con cintura, cuello y tu altura la app estima tu % de grasa.</p>
+    <div class="kpi" id="kpiComp"></div>
+    <div class="seg" id="segCuerpo"><button data-m="peso">Peso</button><button data-m="cintura">Cintura</button><button data-m="grasa">% grasa</button><button data-m="magra">Masa magra</button></div>
+    <div id="chartCuerpo"></div>
+    <div class="sec-mini">Últimos registros</div><div id="listaMedidas"></div>
+  </div>
+
+  <div class="sec-t">Fuerza por máquina</div>
+  <div class="card">
+    <select id="selEj" style="width:100%"></select>
+    <div class="seg" id="segEj">
+      <button data-m="e1rm">1RM estimado</button><button data-m="carga">Carga máx.</button><button data-m="vol">Volumen</button>
+    </div>
+    <div id="chartEj"></div>
+    <div id="tablaEj" style="margin-top:6px"></div>
+  </div>
+
+  <div class="sec-t">Récords (1RM estimado)</div>
+  <div class="card" id="records"></div>
+
+  <div class="sec-t">Constancia</div>
+  <div class="card" id="adherencia"></div>
+</section>
+
+<!-- ======================= NUTRICIÓN ======================= -->
+<section class="view" id="v-nutri">
+  <div class="sec-t">Tus datos</div>
+  <div class="card">
+    <div class="form-grid">
+      <label>Sexo<select id="nSexo"><option value="h">Hombre</option><option value="m">Mujer</option></select></label>
+      <label>Edad<input type="number" inputmode="numeric" id="nEdad"></label>
+      <label>Altura (cm)<input type="number" inputmode="numeric" id="nAltura"></label>
+      <label>Peso (kg)<input type="number" inputmode="decimal" step="0.1" id="nPeso"></label>
+      <label>Actividad diaria
+        <select id="nAct"><option value="sed">Sedentaria</option><option value="lig">Ligera</option><option value="mod">Moderada</option><option value="act">Alta</option></select></label>
+      <label>Objetivo
+        <select id="nObj"><option value="perder">Perder grasa</option><option value="mantener">Mantener</option><option value="ganar">Ganar músculo</option></select></label>
+    </div>
+    <p class="muted" style="font-size:11px;margin-bottom:0">Actividad sin contar el gimnasio: sedentaria = oficina y poco caminar; ligera = de pie o caminando a ratos; moderada = trabajo activo; alta = trabajo físico.</p>
+  </div>
+  <div class="sec-t">Tu plan nutricional</div>
+  <div id="nutriRes"></div>
+</section>
+
+<!-- ======================= CIENCIA ======================= -->
+<section class="view" id="v-ciencia">
+  <div class="sec-t">Por qué este plan funciona</div>
+  <div class="card">
+    <p class="muted"><b>Volumen.</b> Entre 10 y 20 series semanales por músculo producen más hipertrofia que menos; la pantalla Plan muestra el volumen de tu semana (Schoenfeld et al., 2017a).</p>
+    <p class="muted"><b>Frecuencia 2.</b> Cada grupo se entrena dos veces por semana: pecho y espalda martes/miércoles y viernes; piernas lunes y jueves.</p>
+    <p class="muted"><b>Repeticiones y esfuerzo.</b> Series de 8–15 reps cerca del fallo (1–3 en reserva) dan hipertrofia comparable a cargas más pesadas cuando el esfuerzo es similar (Schoenfeld et al., 2017b). Por eso las máquinas funcionan tan bien.</p>
+    <p class="muted"><b>Curl femoral sentado.</b> Entrenar el isquiotibial con la cadera flexionada (sentado) produjo más hipertrofia que hacerlo acostado (Maeo et al., 2021). Por eso es el principal del lunes.</p>
+    <p class="muted"><b>Descansos.</b> Descansos de 2–3 min en los ejercicios principales mejoran fuerza e hipertrofia frente a descansos cortos (Schoenfeld et al., 2016).</p>
+    <p class="muted"><b>Progresión doble.</b> Subes la carga cuando completas el tope del rango en todas las series; si no, sumas repeticiones (Kraemer y Ratamess, 2004). La app lo calcula por ti en cada máquina.</p>
+  </div>
+  <div class="sec-t">Perder grasa sin perder músculo</div>
+  <div class="card">
+    <p class="muted"><b>Ritmo.</b> Perder ~0,7 % del peso por semana o menos preservó más masa magra y fuerza que hacerlo al doble de ritmo (Garthe et al., 2011). La app apunta a ~0,5 %.</p>
+    <p class="muted"><b>Proteína.</b> 1,6–2,2 g por kg al día maximizan la ganancia de músculo con entrenamiento; en déficit conviene la parte alta (Morton et al., 2018; Helms et al., 2014).</p>
+    <p class="muted"><b>Cardio.</b> Combinar cardio y pesas interfiere poco con la hipertrofia si el cardio es moderado y no excesivo (Wilson et al., 2012). Por eso el plan usa sesiones cortas, sobre todo en zona 2.</p>
+    <p class="muted"><b>Sueño.</b> 7–9 horas. Dormir poco empeora la recuperación y el control del hambre (Dattilo et al., 2011).</p>
+    <p class="muted"><b>Creatina.</b> El monohidrato (3–5 g al día) es de los suplementos con mejor evidencia para fuerza y masa magra (Kreider et al., 2017). Consulta a tu médico antes de tomar cualquier suplemento.</p>
+    <p class="muted"><b>Cómo saber si funciona.</b> La app compara la tendencia de tu peso, tu cintura y tu fuerza estimada (fórmula de Epley). Si el peso baja y la fuerza se mantiene, estás perdiendo grasa y no músculo.</p>
+    <p class="muted"><b>Zona de pulso.</b> La app estima tu frecuencia cardiaca máxima con la fórmula de Tanaka (208 − 0,7 × edad) y toma la zona 2 como 60–70 % de ese valor. Es una guía: si puedes conversar en frases completas, estás en zona 2.</p>
+    <p class="muted"><b>% de grasa estimado.</b> Con cintura, cuello y altura (y cadera en mujeres) se usa la ecuación de la Marina de EE. UU. (Hodgdon y Beckett, 1984). Puede errar varios puntos, pero sirve para ver si tu masa magra se mantiene mientras bajas de peso.</p>
+  </div>
+  <div class="sec-t">Tips para tu objetivo</div>
+  <div class="card" id="tipsLista"></div>
+  <div class="sec-t">Referencias</div>
+  <div class="card">
+    <p class="ref">Schoenfeld BJ, Ogborn D, Krieger JW. Dose-response relationship between weekly resistance training volume and increases in muscle mass. J Sports Sci. 2017;35(11):1073-1082.</p>
+    <p class="ref">Schoenfeld BJ, Grgic J, Ogborn D, Krieger JW. Strength and hypertrophy adaptations between low- vs. high-load resistance training. J Strength Cond Res. 2017;31(12):3508-3523.</p>
+    <p class="ref">Maeo S, Huang M, Wu Y, et al. Greater hamstrings muscle hypertrophy but similar damage protection after training at long versus short muscle lengths. Med Sci Sports Exerc. 2021;53(4):825-837.</p>
+    <p class="ref">Schoenfeld BJ, Pope ZK, Benik FM, et al. Longer interset rest periods enhance muscle strength and hypertrophy in resistance-trained men. J Strength Cond Res. 2016;30(7):1805-1812.</p>
+    <p class="ref">Kraemer WJ, Ratamess NA. Fundamentals of resistance training: progression and exercise prescription. Med Sci Sports Exerc. 2004;36(4):674-688.</p>
+    <p class="ref">Garthe I, Raastad T, Refsnes PE, Koch A, Sundgot-Borgen J. Effect of two different weight-loss rates on body composition and strength and power-related performance in elite athletes. Int J Sport Nutr Exerc Metab. 2011;21(2):97-104.</p>
+    <p class="ref">Morton RW, Murphy KT, McKellar SR, et al. A systematic review, meta-analysis and meta-regression of the effect of protein supplementation on resistance training-induced gains in muscle mass and strength. Br J Sports Med. 2018;52(6):376-384.</p>
+    <p class="ref">Helms ER, Aragon AA, Fitschen PJ. Evidence-based recommendations for natural bodybuilding contest preparation: nutrition and supplementation. J Int Soc Sports Nutr. 2014;11:20.</p>
+    <p class="ref">Wilson JM, Marin PJ, Rhea MR, et al. Concurrent training: a meta-analysis examining interference of aerobic and resistance exercises. J Strength Cond Res. 2012;26(8):2293-2307.</p>
+    <p class="ref">Mifflin MD, St Jeor ST, Hill LA, et al. A new predictive equation for resting energy expenditure in healthy individuals. Am J Clin Nutr. 1990;51(2):241-247.</p>
+    <p class="ref">Kreider RB, Kalman DS, Antonio J, et al. ISSN position stand: safety and efficacy of creatine supplementation in exercise, sport, and medicine. J Int Soc Sports Nutr. 2017;14:18.</p>
+    <p class="ref">Tanaka H, Monahan KD, Seals DR. Age-predicted maximal heart rate revisited. J Am Coll Cardiol. 2001;37(1):153-156.</p>
+    <p class="ref">Hodgdon JA, Beckett MB. Prediction of percent body fat for U.S. Navy men and women from body circumferences and height. Naval Health Research Center; 1984.</p>
+    <p class="ref">Dattilo M, et al. Sleep and muscle recovery: endocrinological and molecular basis for a new and promising hypothesis. Med Hypotheses. 2011;77(2):220-222.</p>
+    <p class="muted" style="margin-top:10px">Verifica cada referencia en PubMed antes de citarla en un trabajo formal. La app orienta; no reemplaza a un médico, nutricionista o entrenador.</p>
+  </div>
+</section>
+
+<!-- ======================= AJUSTES ======================= -->
+<section class="view" id="v-ajustes">
+  <div class="sec-t">Entrenamiento</div>
+  <div class="card">
+    <div class="toggle"><div>Alternativas con mancuernas<small>Apagado: el plan usa solo máquinas y poleas. Encendido: las mancuernas aparecen en el selector "¿Ocupada?".</small></div><label class="switch"><input type="checkbox" id="sDumb"><span></span></label></div>
+    <div class="toggle"><div>Semanas de descarga<small>Cada 6 semanas: la mitad de las series con la misma carga.</small></div><label class="switch"><input type="checkbox" id="sDesc"><span></span></label></div>
+    <div class="toggle"><div>Inicio del plan<small id="semActual"></small></div><input type="date" id="sInicio" style="max-width:150px"></div>
+    <div class="toggle"><div>Incremento de carga general<small>Puedes cambiarlo por máquina en su ficha técnica.</small></div>
+      <select id="sInc" style="max-width:110px"><option value="1">1 kg</option><option value="1.25">1.25 kg</option><option value="2.5">2.5 kg</option><option value="5">5 kg</option></select></div>
+    <div class="toggle"><div>Sonido y vibración<small>Al terminar el descanso y al completar la sesión.</small></div><label class="switch"><input type="checkbox" id="sFeed"><span></span></label></div>
+    <div class="toggle"><div>Pantalla encendida durante la sesión<small>Evita que el teléfono se bloquee mientras entrenas.</small></div><label class="switch"><input type="checkbox" id="sPant"><span></span></label></div>
+  </div>
+  <div class="sec-t">Tus datos</div>
+  <div class="card">
+    <p class="muted" style="margin-top:0">Tu progreso se guarda en este teléfono, dentro de la app. Guarda un respaldo cada dos semanas (en Drive, WhatsApp o correo) y antes de cambiar de teléfono; la app te lo recuerda. No borres los datos del navegador para esta dirección.</p>
+    <div class="acciones"><button class="btn" id="btnExport">Guardar respaldo</button><button class="btn" id="btnImport">Importar respaldo</button></div>
+    <div class="acciones"><button class="btn peligro" id="btnBorrar">Borrar todo el progreso</button></div>
+    <input type="file" id="fileImport" accept="application/json,.json" class="hidden">
+  </div>
+  <div class="sec-t">Instalar y actualizar</div>
+  <div class="card">
+    <p class="muted" style="margin-top:0"><b>Android:</b> abre la dirección de la app en Chrome → menú ⋮ → <b>Instalar aplicación</b>. <b>iPhone:</b> Safari → Compartir → <b>Agregar a inicio</b>.</p>
+    <p class="muted">Funciona sin internet. Cuando haya una versión nueva verás el aviso <b>Actualizar</b> arriba; tus datos se conservan.</p>
+  </div>
+  <p class="muted" id="versionTxt" style="text-align:center;margin-top:18px"></p>
+</section>
+
+<nav class="tabbar">
+  <button data-v="hoy" class="activo"><span class="ico">●</span>Hoy</button>
+  <button data-v="plan"><span class="ico">≡</span>Plan</button>
+  <button data-v="progreso"><span class="ico">↗</span>Progreso</button>
+  <button data-v="nutri"><span class="ico">◐</span>Nutrición</button>
+  <button data-v="ciencia"><span class="ico">✚</span>Ciencia</button>
+</nav>
+
+<div class="descanso hidden" id="descanso" role="timer" aria-live="polite">
+  <div><div class="l">DESCANSO</div><div class="t" id="descT">0:00</div><div class="sig" id="descSig"></div></div>
+  <div><button id="descMas">+30 s</button><button id="descFin">Saltar</button></div>
+</div>
+<div class="toast" id="toast" role="status"></div>
+<div class="celebra hidden" id="celebra">
+  <div class="caja"><div class="big">💪</div><h2 id="celT">¡Sesión completada!</h2><div id="celX"></div>
+    <button class="btn pri" id="celOk" style="margin-top:16px;width:100%">Seguimos</button>
+    <button class="btn" id="celShare" style="margin-top:8px;width:100%">Compartir resumen</button></div>
+</div>
+
+<script src="maquinas.js"></script>
+<script src="plan.js"></script>
+<script src="pict.js"></script>
+<script src="core.js"></script>
+<script src="hoy.js"></script>
+<script src="vistas.js"></script>
+</body>
+</html>
